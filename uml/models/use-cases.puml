@@ -1,0 +1,31 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+actor "Пользователь" as U
+rectangle "TaskFlow 1.0" {
+ usecase "UC-01\nПросмотреть доску" as UC1
+ usecase "UC-02\nСоздать задачу" as UC2
+ usecase "UC-03\nИзменить задачу" as UC3
+ usecase "UC-04\nИзменить статус" as UC4
+ usecase "UC-05\nУдалить задачу" as UC5
+ usecase "UC-06\nНайти задачи" as UC6
+ usecase "UC-07\nФильтровать" as UC7
+ usecase "UC-08\nЭкспорт CSV" as UC8
+ usecase "UC-09\nСоздать повтор" as UC9
+ usecase "UC-10\nНазначить повторение" as UC10
+ usecase "UC-11\nПроверить ввод" as UC11
+}
+U --> UC1
+U --> UC2
+U --> UC3
+U --> UC4
+U --> UC5
+U --> UC6
+U --> UC7
+U --> UC8
+UC2 ..> UC11 : <<include>>
+UC3 ..> UC11 : <<include>>
+UC10 ..> UC2 : <<extend>>
+UC10 ..> UC3 : <<extend>>
+UC9 ..> UC4 : <<extend>>
+@enduml

@@ -1,0 +1,21 @@
+@startuml
+title Состояния задачи TaskFlow
+[*] --> TODO : create / сохранить
+state "К выполнению" as TODO
+state "В работе" as DOING
+state "Готово" as DONE
+TODO --> DOING : changeStatus(IN_PROGRESS)
+DOING --> TODO : changeStatus(TODO)
+DOING --> DONE : changeStatus(DONE) / [BR-08, BR-09]
+TODO --> DONE : changeStatus(DONE) / [BR-08, BR-09]
+DONE --> DOING : changeStatus(IN_PROGRESS)
+DONE --> TODO : changeStatus(TODO)
+TODO --> [*] : delete [confirmed]
+DOING --> [*] : delete [confirmed]
+DONE --> [*] : delete [confirmed]
+note right of DONE
+При первом переходе в DONE
+с DAILY/WEEKLY создаётся
+один новый Task в TODO.
+end note
+@enduml

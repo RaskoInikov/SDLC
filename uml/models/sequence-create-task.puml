@@ -1,0 +1,34 @@
+@startuml
+title UC-02 Создание задачи
+actor Пользователь as U
+participant "Web UI" as UI
+participant ":TaskController" as C
+participant ":TaskService" as S
+participant ":TaskValidator" as V
+database "TaskRepository / БД" as DB
+U -> UI : заполнить форму и сохранить
+UI -> C : POST /api/tasks (JSON)
+activate C
+C -> V : validate(form)
+activate V
+V --> C : result
+deactivate V
+alt поля невалидны
+ C --> UI : HTTP 400 + ошибки
+ UI --> U : показать ошибки
+else данные допустимы
+ C -> S : create(form)
+ activate S
+ create participant "task:Task" as T
+ S -> T : <<create>>
+ S -> DB : save(task)
+ activate DB
+ DB --> S : saved(id)
+ deactivate DB
+ S --> C : TaskDTO
+ deactivate S
+ C --> UI : HTTP 201 + TaskDTO
+ UI --> U : карточка в TODO
+end
+deactivate C
+@enduml

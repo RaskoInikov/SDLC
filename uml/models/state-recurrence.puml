@@ -1,0 +1,17 @@
+@startuml
+title Жизненный цикл генерации повтора
+[*] --> NoRule
+state "Без повтора" as NoRule
+state "Правило задано" as Ready
+state "Создание экземпляра" as Generate
+state "Экземпляр создан" as Generated
+state "Ошибка транзакции" as Failed
+NoRule --> Ready : setRule(DAILY/WEEKLY) [dueDate != null]
+Ready --> NoRule : setRule(NONE)
+Ready --> Generate : complete() [первый DONE]
+Generate --> Generated : commit / createNext(TODO)
+Generate --> Failed : storageError / rollback
+Failed --> Ready : retry / без частичных изменений
+Generated --> Generated : повторный complete() / без дубля
+Generated --> [*] : завершение обработки
+@enduml

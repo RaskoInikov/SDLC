@@ -1,0 +1,36 @@
+@startuml
+title UC-04/09 Завершение и повторение
+actor Пользователь as U
+participant "Web UI" as UI
+participant ":TaskController" as C
+participant ":TaskService" as S
+database "TaskRepository / БД" as DB
+U -> UI : переместить в «Готово»
+UI -> C : PATCH /api/tasks/{id}/status DONE
+C -> S : changeStatus(id,DONE)
+activate S
+S -> DB : findById(id)
+DB --> S : Task
+alt статус уже DONE
+ S --> C : без изменений
+else первый переход в DONE
+ S -> DB : update(status=DONE)
+ alt recurrenceRule = NONE
+  note over S : Следующий экземпляр не создаётся
+ else DAILY или WEEKLY
+  S -> DB : findNextOccurrence(id)
+  alt следующий ещё не создан
+   create participant "next:Task" as N
+   S -> N : <<create>> / dueDate +1/+7 дней
+   S -> DB : save(next, status=TODO)
+  else повтор уже существует
+   note over S : Не создавать дубль (BR-09)
+  end
+ end
+ S -> DB : commit transaction
+end
+S --> C : результат
+deactivate S
+C --> UI : HTTP 200 + список изменений
+UI --> U : обновить доску
+@enduml
